@@ -570,7 +570,7 @@ var T = {
     confirmed:"✓ 確認済み",unconfirmed:"未確認",
     confirm_btn:"この週を確認済みにする",undo_btn:"取消",
     stat_done:"点検済み",stat_ng:"不良あり",stat_em:"未実施",stat_days:"稼働日",prog_label:"今月の点検進捗",
-    need_mgr:"管理者を選択してください",need_op:"担当者を選択してください",reset_sub:"この操作は元に戻せません",week_col:"週",rate_col:"実施率",days_col:"日程",cfm_col:"確認",pct:"実施率",schedule:"日程",confirm_col:"確認",cant_undo:"この操作は元に戻せません",
+    need_mgr:"管理者を選択してください",need_op:"担当者を選択してください",reset_sub:"この操作は元に戻せません",week_col:"週",rate_col:"実施率",days_col:"日程",cfm_col:"確認",last_sync:"最終同期",pct:"実施率",schedule:"日程",confirm_col:"確認",cant_undo:"この操作は元に戻せません",
     week_confirmed:"週の確認が完了しました",undo_done:"取り消しました",
     monthly_mg_hdr:"定期点検 管理者確認（月1回）",
     monthly_mg_confirmed:"✓ 今月の定期点検確認済み",
@@ -634,7 +634,7 @@ var T = {
     confirmed:"✓ Đã xác nhận",unconfirmed:"Chưa xác nhận",
     confirm_btn:"Xác nhận tuần này",undo_btn:"Hủy",
     stat_done:"Đã KT",stat_ng:"Có lỗi",stat_em:"Chưa KT",stat_days:"Ngày làm",prog_label:"Tiến độ kiểm tra tháng này",
-    need_mgr:"Vui lòng chọn quản lý",need_op:"Vui lòng chọn người phụ trách",reset_sub:"Không thể hoàn tác thao tác này",week_col:"Tuần",rate_col:"Tỷ lệ",days_col:"Ngày",cfm_col:"XN",pct:"Tỷ lệ",schedule:"Lịch",confirm_col:"Xác nhận",cant_undo:"Không thể hoàn tác thao tác này",
+    need_mgr:"Vui lòng chọn quản lý",need_op:"Vui lòng chọn người phụ trách",reset_sub:"Không thể hoàn tác thao tác này",week_col:"Tuần",rate_col:"Tỷ lệ",days_col:"Ngày",cfm_col:"XN",last_sync:"Đồng bộ lần cuối",pct:"Tỷ lệ",schedule:"Lịch",confirm_col:"Xác nhận",cant_undo:"Không thể hoàn tác thao tác này",
     week_confirmed:" đã xác nhận",undo_done:"Đã hủy",
     monthly_mg_hdr:"Xác nhận quản lý kiểm tra định kỳ（1 lần/tháng）",
     monthly_mg_confirmed:"✓ Đã xác nhận kiểm tra định kỳ tháng này",
@@ -1310,7 +1310,7 @@ function renderMgPanel(){
   var lwd2=lastWD(y,m);
   var mmgCard=document.createElement("div"); mmgCard.className="monthly-mg-card";
   var mmgHc=mmg.done?"#7c3aed":"#7c3aed";
-  mmgCard.innerHTML="<div class='monthly-mg-hdr'><span>"+l2.monthly_mg_hdr+"</span><span style='font-size:11px;opacity:0.9;'>"+(mmg.done?l2.monthly_mg_confirmed:"未確認")+"</span></div>";
+  mmgCard.innerHTML="<div class='monthly-mg-hdr'><span>"+l2.monthly_mg_hdr+"</span><span style='font-size:11px;opacity:0.9;'>"+(mmg.done?l2.monthly_mg_confirmed:l2.unconfirmed)+"</span></div>";
 
   var mmgItems="<div>";
   for(var mi3=0;mi3<l2.monthly.length;mi3++){
@@ -1568,7 +1568,7 @@ function syncFromServer() {
       }
       if (changed) { save(); renderCal(); renderDayPanel(); renderOps(); renderMgrs(); }
       var t = new Date();
-      showSync("最終同期: "+t.getHours()+":"+(t.getMinutes()<10?"0":"")+t.getMinutes()+":"+(t.getSeconds()<10?"0":"")+t.getSeconds(), "#27ae60");
+      showSync((L().last_sync||"最終同期")+": "+t.getHours()+":"+(t.getMinutes()<10?"0":"")+t.getMinutes()+":"+(t.getSeconds()<10?"0":"")+t.getSeconds(), "#27ae60");
     } else { showSync("エラー", "#e74c3c"); }
   };
   el.src = GAS + "?action=getAll&callback=" + cb + "&t=" + Date.now();
@@ -1776,4 +1776,3 @@ setInterval(save,30000);
 
 </body>
 </html>
-
