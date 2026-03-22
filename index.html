@@ -368,7 +368,7 @@ select:focus,input:focus{outline:none;}
 <div class="sidebar">
   <div class="logo">
     <div class="logo-icon">&#x1F3D7;</div>
-    <div><div class="logo-text">FORKLIFT</div><div class="logo-sub">点検管理システム</div></div>
+    <div><div class="logo-text">FORKLIFT</div><div class="logo-sub" id="logoSub">点検管理システム</div></div>
   </div>
   <nav class="sidebar-nav">
     <div class="nav-item on" id="t0">
@@ -554,7 +554,7 @@ var T = {
   ja:{
     title:"フォークリフト点検表",
     langBtn:"&#x1F1FB;&#x1F1F3; Tiếng Việt",
-    tabs:["点検入力","月別一覧","管理者確認","設定"],tabs_short:["点検","一覧","管理","設定"],
+    tabs:["点検入力","月別一覧","管理者確認","設定"],tabs_short:["点検","一覧","管理","設定"],week_lbl:"週",
     lbl_op:"担当者",lbl_ym:"年月",lbl_mgr:"管理者",
     btn_hol:"出勤休日設定",btn_csv:"データ出力",
     lbl_addHol:"追加休日（平日→休日）",lbl_addWday:"出勤日（休日→出勤）",
@@ -570,7 +570,7 @@ var T = {
     confirmed:"✓ 確認済み",unconfirmed:"未確認",
     confirm_btn:"この週を確認済みにする",undo_btn:"取消",
     stat_done:"点検済み",stat_ng:"不良あり",stat_em:"未実施",stat_days:"稼働日",prog_label:"今月の点検進捗",
-    need_mgr:"管理者を選択してください",need_op:"担当者を選択してください",
+    need_mgr:"管理者を選択してください",need_op:"担当者を選択してください",reset_sub:"この操作は元に戻せません",week_col:"週",rate_col:"実施率",days_col:"日程",cfm_col:"確認",pct:"実施率",schedule:"日程",confirm_col:"確認",cant_undo:"この操作は元に戻せません",
     week_confirmed:"週の確認が完了しました",undo_done:"取り消しました",
     monthly_mg_hdr:"定期点検 管理者確認（月1回）",
     monthly_mg_confirmed:"✓ 今月の定期点検確認済み",
@@ -618,7 +618,7 @@ var T = {
   vi:{
     title:"Bảng kiểm tra xe nâng",
     langBtn:"&#x1F1EF;&#x1F1F5; 日本語",
-    tabs:["Nhập kiểm tra","Danh sách","Xác nhận QL","Cài đặt"],tabs_short:["Kiểm tra","Danh sách","Xác nhận","Cài đặt"],
+    tabs:["Nhập kiểm tra","Danh sách","Xác nhận QL","Cài đặt"],tabs_short:["Kiểm tra","Danh sách","Xác nhận","Cài đặt"],week_lbl:"Tuần",
     lbl_op:"Người phụ trách",lbl_ym:"Năm/Tháng",lbl_mgr:"Quản lý",
     btn_hol:"Cài đặt ngày nghỉ/làm",btn_csv:"Xuất dữ liệu",
     lbl_addHol:"Thêm ngày nghỉ（ngày thường→nghỉ）",lbl_addWday:"Thêm ngày làm（nghỉ→làm việc）",
@@ -634,7 +634,7 @@ var T = {
     confirmed:"✓ Đã xác nhận",unconfirmed:"Chưa xác nhận",
     confirm_btn:"Xác nhận tuần này",undo_btn:"Hủy",
     stat_done:"Đã KT",stat_ng:"Có lỗi",stat_em:"Chưa KT",stat_days:"Ngày làm",prog_label:"Tiến độ kiểm tra tháng này",
-    need_mgr:"Vui lòng chọn quản lý",need_op:"Vui lòng chọn người phụ trách",
+    need_mgr:"Vui lòng chọn quản lý",need_op:"Vui lòng chọn người phụ trách",reset_sub:"Không thể hoàn tác thao tác này",week_col:"Tuần",rate_col:"Tỷ lệ",days_col:"Ngày",cfm_col:"XN",pct:"Tỷ lệ",schedule:"Lịch",confirm_col:"Xác nhận",cant_undo:"Không thể hoàn tác thao tác này",
     week_confirmed:" đã xác nhận",undo_done:"Đã hủy",
     monthly_mg_hdr:"Xác nhận quản lý kiểm tra định kỳ（1 lần/tháng）",
     monthly_mg_confirmed:"✓ Đã xác nhận kiểm tra định kỳ tháng này",
@@ -757,6 +757,8 @@ function applyLang(){
   document.getElementById("dlgOk").textContent=l.dlg_ok;
   var now=new Date();
   document.getElementById("hdrSub").textContent=l.fmt_date(now.getFullYear(),now.getMonth()+1,now.getDate(),l.dow[now.getDay()]);
+  var logoSub=document.getElementById("logoSub");
+  if(logoSub) logoSub.textContent=S.lang==="ja"?"点検管理システム":"Hệ thống kiểm tra";
   renderOps(); renderMgrs();
 }
 
@@ -1012,10 +1014,11 @@ function renderMobMonthly(selDay){
   wrap.appendChild(titleRow);
 
   var legend=document.createElement("div"); legend.className="mob-legend";
-  legend.innerHTML="<div class='mob-legend-item'><div class='mob-legend-dot' style='background:var(--glt);border:1px solid #6ee7b7;'></div>点検済み</div>"
-    +"<div class='mob-legend-item'><div class='mob-legend-dot' style='background:var(--rlt);border:1px solid #fca5a5;'></div>不良あり</div>"
-    +"<div class='mob-legend-item'><div class='mob-legend-dot' style='background:#f8fafc;border:1px solid var(--bdr);'></div>未入力</div>"
-    +"<div class='mob-legend-item'><div class='mob-legend-dot' style='background:repeating-linear-gradient(45deg,#e8ecf0,#e8ecf0 3px,#f8fafc 3px,#f8fafc 7px);'></div>休日</div>";
+  var ll=L();
+  legend.innerHTML="<div class='mob-legend-item'><div class='mob-legend-dot' style='background:var(--glt);border:1px solid #6ee7b7;'></div>"+ll.st_done+"</div>"
+    +"<div class='mob-legend-item'><div class='mob-legend-dot' style='background:var(--rlt);border:1px solid #fca5a5;'></div>"+ll.st_ng+"</div>"
+    +"<div class='mob-legend-item'><div class='mob-legend-dot' style='background:#f8fafc;border:1px solid var(--bdr);'></div>"+ll.st_empty+"</div>"
+    +"<div class='mob-legend-item'><div class='mob-legend-dot' style='background:repeating-linear-gradient(45deg,#e8ecf0,#e8ecf0 3px,#f8fafc 3px,#f8fafc 7px);'></div>"+ll.holiday+"</div>";
   wrap.appendChild(legend);
 
   // Calendar grid
@@ -1162,7 +1165,7 @@ function renderMgPanel(){
   var tbl=document.createElement("table"); tbl.className="mg-table";
   var thead=document.createElement("thead");
   var thRow=document.createElement("tr"); thRow.className="mg-thead";
-  ["週",l.stat_done,l.stat_ng,l.stat_em,l.stat_days,"実施率","日程","確認"].forEach(function(h,i){
+  [l.week_lbl||"週",l.stat_done,l.stat_ng,l.stat_em,l.stat_days,l.pct,l.schedule,l.confirm_col].forEach(function(h,i){
     var th=document.createElement("th"); th.textContent=h;
     if(i>0) th.style.textAlign="center";
     thRow.appendChild(th);
@@ -1200,7 +1203,7 @@ function renderMgPanel(){
       tr.appendChild(mkStat(ng,"var(--red)",l.stat_ng));
       tr.appendChild(mkStat(em,"var(--txt3)",l.stat_em));
       tr.appendChild(mkStat(tot,"var(--txt)",l.stat_days));
-      tr.appendChild(mkStat(pct+"%",pctCol,"実施率"));
+      tr.appendChild(mkStat(pct+"%",pctCol,l.pct));
 
       var tdDots=document.createElement("td"); tdDots.className="mg-dots-cell";
       var dotsDiv=document.createElement("div"); dotsDiv.className="mg-dots";
@@ -1473,7 +1476,7 @@ function renderSettings(){
   var rTr=document.createElement("div");
   rTr.style.cssText="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;gap:10px;";
   var rTd1=document.createElement("div");
-  rTd1.innerHTML="<div style='font-size:13px;font-weight:500;color:var(--txt);'>"+l.reset_label+"</div><div style='font-size:11px;color:var(--txt3);margin-top:3px;'>この操作は元に戻せません</div>";
+  rTd1.innerHTML="<div style='font-size:13px;font-weight:500;color:var(--txt);'>"+l.reset_label+"</div><div style='font-size:11px;color:var(--txt3);margin-top:3px;'>"+l.cant_undo+"</div>";
   var rTd2=document.createElement("div"); rTd2.style.cssText="flex-shrink:0;";
   var rBtn=document.createElement("button"); rBtn.className="btn-sm red"; rBtn.textContent=l.btn_reset;
   rBtn.addEventListener("click",function(){
