@@ -390,8 +390,8 @@ select:focus,input:focus{outline:none;}
   </nav>
   <div class="sync-area">
     <div class="sync-pill">
-      <div class="sync-dot" id="syncDot"></div>
-      <span class="sync-txt" id="syncStatus">接続中...</span>
+      <div class="sync-dot" id="syncDot2"></div>
+      <span class="sync-txt" id="syncStatus2">接続中...</span>
     </div>
   </div>
 </div>
@@ -1522,10 +1522,15 @@ var _pushTimer = null;
 var _syncing = false;
 
 function showSync(msg, col) {
-  var el = document.getElementById("syncStatus");
-  var dot = document.getElementById("syncDot");
-  if (el) el.textContent = msg;
-  if (dot) dot.style.background = (col==="#27ae60"||col==="var(--green)") ? "var(--green)" : (col==="#e74c3c"||col==="var(--red)") ? "var(--red)" : "var(--amber)";
+  var isOk=(col==="#27ae60"||col==="var(--green)");
+  var isErr=(col==="#e74c3c"||col==="var(--red)");
+  var bg=isOk?"var(--green)":isErr?"var(--red)":"var(--amber)";
+  ["syncStatus","syncStatus2"].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.textContent=msg;
+  });
+  ["syncDot","syncDot2"].forEach(function(id){
+    var dot=document.getElementById(id); if(dot) dot.style.background=bg;
+  });
 }
 
 /* JSONP でサーバーからデータ取得 */
@@ -1611,7 +1616,10 @@ function undoWeek(y,m,wn2){
   });
 }
 setInterval(syncFromServer, 30000);
-setTimeout(syncFromServer, 2000);
+setTimeout(function(){
+  showSync("同期中...", "var(--amber)");
+  syncFromServer();
+}, 800);
 
 
 load();
